@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {AfterViewInit, ViewChild} from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatTableDataSource} from '@angular/material/table';
+import {AnnualRecordService} from "../services/annual-record.service";
 
 @Component({
   selector: 'app-annual-records-view',
@@ -11,6 +12,7 @@ import {MatTableDataSource} from '@angular/material/table';
 export class AnnualRecordsViewComponent implements OnInit {
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
   dataSource = new MatTableDataSource<PeriodicElement>(ELEMENT_DATA);
+  annualRecords!: any[];
 
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
 
@@ -18,7 +20,14 @@ export class AnnualRecordsViewComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
   }
 
-  constructor() { }
+  constructor(private annualRecordService: AnnualRecordService) {
+    annualRecordService.getAllAnnualRecords().subscribe(
+      data => {
+        this.annualRecords = data;
+        console.log(data);
+      }
+    )
+  }
 
   ngOnInit(): void {
   }
