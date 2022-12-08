@@ -1,13 +1,16 @@
 table {
   width: 100%;
-  /*min-width: 600px;*/
+  min-width: 600px;
 }
 
 .container{
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin: 20px;
+  /*display: flex;*/
+  /*justify-content: center;*/
+
+  width: 90%;
+  min-width: 620px;
+  padding: 20px;
+  margin: auto;
 }
 
 .md-margin{

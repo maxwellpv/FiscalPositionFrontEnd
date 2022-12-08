@@ -127,7 +127,7 @@ export class AnnualRecordsViewComponent implements OnInit {
       category: this.annualRecordForm.controls['category'].value,
       item: this.annualRecordForm.controls['item'].value,
       amount: this.annualRecordForm.controls['amount'].value,
-      gdp: this.annualRecordForm.controls['gdp'].value
+      gdp: this.annualRecordForm.controls['gdp'].value/100
     }
     if(this.editId!=0){
       this.annualRecordService.putAnnualRecord(item, this.editId).subscribe((response:any)=>{
