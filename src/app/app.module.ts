@@ -12,6 +12,7 @@ import {MatInputModule} from "@angular/material/input";
 import {MatButtonModule} from "@angular/material/button";
 import {MatSelectModule} from "@angular/material/select";
 import {MatCardModule} from "@angular/material/card";
+import {MatSortModule} from "@angular/material/sort";
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import {MatCardModule} from "@angular/material/card";
     MatButtonModule,
     MatSelectModule,
     FormsModule,
-    MatCardModule
+    MatCardModule,
+    MatSortModule
   ],
   providers: [],
   bootstrap: [AppComponent]

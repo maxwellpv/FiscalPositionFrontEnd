@@ -4,6 +4,7 @@ import {MatPaginator} from '@angular/material/paginator';
 import {MatTableDataSource} from '@angular/material/table';
 import {AnnualRecordService} from "../services/annual-record.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {MatSort} from "@angular/material/sort";
 
 @Component({
   selector: 'app-annual-records-view',
@@ -14,11 +15,10 @@ export class AnnualRecordsViewComponent implements OnInit {
   displayedColumns: string[] = ['year', 'state', 'category', 'item', 'amount', 'gdp', 'actions'];
   annualRecords!: any[];
   dataSource = new MatTableDataSource<AnnualRecord>(this.annualRecords);
-  clickedRows = new Set<any>();
   isEdit = false;
   editId = 0;
 
-  registerForm: FormGroup =  this.formBuilder.group({
+  annualRecordForm: FormGroup =  this.formBuilder.group({
     year: ['', {validators: [Validators.min(1900), Validators.required, Validators.pattern("^[0-9]*$"), Validators.max(2100)], updateOn: 'change'}],
     gdp: ['', {validators: [Validators.required], updateOn: 'change'}],
     amount: ['',{validators: [Validators.required], updateOn: 'change'} ],
@@ -28,9 +28,11 @@ export class AnnualRecordsViewComponent implements OnInit {
   });
 
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
+  @ViewChild(MatSort) sort: MatSort | any;
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   loadData(){
@@ -38,8 +40,19 @@ export class AnnualRecordsViewComponent implements OnInit {
       data => {
         this.annualRecords = data;
         this.dataSource = new MatTableDataSource<AnnualRecord>(this.annualRecords);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
       }
     )
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   constructor(private annualRecordService: AnnualRecordService, private formBuilder: FormBuilder) {
@@ -51,7 +64,7 @@ export class AnnualRecordsViewComponent implements OnInit {
 
   public findInvalidControls() {
     const invalid = [];
-    const controls = this.registerForm.controls;
+    const controls = this.annualRecordForm.controls;
     for (const name in controls) {
       if (controls[name].invalid) {
         invalid.push(name);
@@ -63,52 +76,68 @@ export class AnnualRecordsViewComponent implements OnInit {
   selectAnnualRecord(row: any){
     this.editId = row.id;
     // this.registerForm.controls['id'].setValue(row.id);
-    this.registerForm.controls['year'].setValue(row.year);
-    this.registerForm.controls['state'].setValue(row.state);
-    this.registerForm.controls['category'].setValue(row.category);
-    this.registerForm.controls['item'].setValue(row.item);
-    this.registerForm.controls['amount'].setValue(row.amount);
-    this.registerForm.controls['gdp'].setValue(row.gdp);
+    this.annualRecordForm.controls['year'].setValue(row.year);
+    this.annualRecordForm.controls['state'].setValue(row.state);
+    this.annualRecordForm.controls['category'].setValue(row.category);
+    this.annualRecordForm.controls['item'].setValue(row.item);
+    this.annualRecordForm.controls['amount'].setValue(row.amount);
+    this.annualRecordForm.controls['gdp'].setValue(row.gdp);
     this.isEdit = true;
     console.log(row);
   }
 
   clearForm(){
-    this.registerForm.controls['year'].setValue('');
-    this.registerForm.controls['state'].setValue('');
-    this.registerForm.controls['category'].setValue('');
-    this.registerForm.controls['item'].setValue('');
-    this.registerForm.controls['amount'].setValue('');
-    this.registerForm.controls['gdp'].setValue('');
+
+    this.annualRecordForm.controls['year'].setValue('');
+    this.annualRecordForm.controls['state'].setValue('');
+    this.annualRecordForm.controls['category'].setValue('');
+    this.annualRecordForm.controls['item'].setValue('');
+    this.annualRecordForm.controls['amount'].setValue('');
+    this.annualRecordForm.controls['gdp'].setValue('');
+
+    this.annualRecordForm.controls['year'].setErrors(null);
+    this.annualRecordForm.controls['state'].setErrors(null);
+    this.annualRecordForm.controls['category'].setErrors(null);
+    this.annualRecordForm.controls['item'].setErrors(null);
+    this.annualRecordForm.controls['amount'].setErrors(null);
+    this.annualRecordForm.controls['gdp'].setErrors(null);
+
+    this.annualRecordForm.setErrors({'invalid':true})
+
+    // this.registerForm.controls['year'].updateValueAndValidity();
+    // this.registerForm.controls['state'].updateValueAndValidity();
+    // this.registerForm.controls['category'].updateValueAndValidity();
+    // this.registerForm.controls['item'].updateValueAndValidity();
+    // this.registerForm.controls['amount'].updateValueAndValidity();
+    // this.registerForm.controls['gdp'].updateValueAndValidity();
+
     this.editId = 0;
+    this.isEdit = false;
   }
 
   cancelButton(){
     // this.registerForm.controls['id'].setValue(row.id);
     this.clearForm()
-    this.isEdit = false;
   }
 
   saveAnnualRecord(){
     let item = {
-      year: this.registerForm.controls['year'].value,
-      state: this.registerForm.controls['state'].value,
-      category: this.registerForm.controls['category'].value,
-      item: this.registerForm.controls['item'].value,
-      amount: this.registerForm.controls['amount'].value,
-      gdp: this.registerForm.controls['gdp'].value
+      year: this.annualRecordForm.controls['year'].value,
+      state: this.annualRecordForm.controls['state'].value,
+      category: this.annualRecordForm.controls['category'].value,
+      item: this.annualRecordForm.controls['item'].value,
+      amount: this.annualRecordForm.controls['amount'].value,
+      gdp: this.annualRecordForm.controls['gdp'].value
     }
-    console.log("Errores")
-    console.log(this.findInvalidControls())
     if(this.editId!=0){
       this.annualRecordService.putAnnualRecord(item, this.editId).subscribe((response:any)=>{
-        window.alert("Annual Record saved successful.");
+        window.alert("Annual Record updated successful.");
         this.loadData();
         this.clearForm();
       });
     } else {
       this.annualRecordService.postAnnualRecord(item).subscribe((response:any)=>{
-        window.alert("Annual Record updated successful.");
+        window.alert("Annual Record saved successful.");
         this.loadData();
         this.clearForm();
       });
@@ -117,41 +146,23 @@ export class AnnualRecordsViewComponent implements OnInit {
     console.log(item);
   }
 
-  deleteAnnualRecord(){
-
+  deleteAnnualRecord(id: number){
+    this.annualRecordService.deleteAnnualRecord(id).subscribe(
+      (response:any) =>{
+        window.alert("Annual Record delete successful.");
+        this.loadData();
+      }
+    )
   }
 
 }
 
 export interface AnnualRecord {
   id: number;
-  year: string;
+  year: number;
   gdp: number;
   amount: number;
   item: string;
   state: number;
   category: string;
 }
-
-// const ELEMENT_DATA: PeriodicElement[] = [
-//   {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H'},
-//   {position: 2, name: 'Helium', weight: 4.0026, symbol: 'He'},
-//   {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li'},
-//   {position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be'},
-//   {position: 5, name: 'Boron', weight: 10.811, symbol: 'B'},
-//   {position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C'},
-//   {position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N'},
-//   {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O'},
-//   {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F'},
-//   {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne'},
-//   {position: 11, name: 'Sodium', weight: 22.9897, symbol: 'Na'},
-//   {position: 12, name: 'Magnesium', weight: 24.305, symbol: 'Mg'},
-//   {position: 13, name: 'Aluminum', weight: 26.9815, symbol: 'Al'},
-//   {position: 14, name: 'Silicon', weight: 28.0855, symbol: 'Si'},
-//   {position: 15, name: 'Phosphorus', weight: 30.9738, symbol: 'P'},
-//   {position: 16, name: 'Sulfur', weight: 32.065, symbol: 'S'},
-//   {position: 17, name: 'Chlorine', weight: 35.453, symbol: 'Cl'},
-//   {position: 18, name: 'Argon', weight: 39.948, symbol: 'Ar'},
-//   {position: 19, name: 'Potassium', weight: 39.0983, symbol: 'K'},
-//   {position: 20, name: 'Calcium', weight: 40.078, symbol: 'Ca'},
-// ];

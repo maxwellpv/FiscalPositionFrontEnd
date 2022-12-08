@@ -1,49 +1,54 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <div class="container">
+
   <div class="mat-elevation-z8 md-margin">
+    <mat-form-field style="width: 100%">
+      <mat-label>Filter</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Ex. 2020" #input>
+    </mat-form-field>
     <mat-card-header>
       <mat-card-title>Government Budget and Fiscal Position, Annual</mat-card-title>
     </mat-card-header>
-    <table mat-table [dataSource]="dataSource">
+    <table mat-table [dataSource]="dataSource" matSort>
 
       <!-- Position Column -->
       <ng-container matColumnDef="year">
-        <th mat-header-cell *matHeaderCellDef> Year of balance </th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Year of balance </th>
         <td mat-cell *matCellDef="let element"> {{element.year}} </td>
       </ng-container>
 
       <!-- Name Column -->
       <ng-container matColumnDef="state">
-        <th mat-header-cell *matHeaderCellDef> Actual/Revised/Estimated </th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Actual/Revised/Estimated </th>
         <td mat-cell *matCellDef="let element"> {{element.state}} </td>
       </ng-container>
 
       <!-- Weight Column -->
       <ng-container matColumnDef="category">
-        <th mat-header-cell *matHeaderCellDef> Category </th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Category </th>
         <td mat-cell *matCellDef="let element"> {{element.category}} </td>
       </ng-container>
 
       <!-- Symbol Column -->
       <ng-container matColumnDef="item">
-        <th mat-header-cell *matHeaderCellDef> Item </th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Item </th>
         <td mat-cell *matCellDef="let element"> {{element.item}} </td>
       </ng-container>
 
       <ng-container matColumnDef="amount">
-        <th mat-header-cell *matHeaderCellDef> Amount (S$ million) </th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount (S$ million) </th>
         <td mat-cell *matCellDef="let element"> {{element.amount | number: '1.2'}} </td>
       </ng-container>
 
       <ng-container matColumnDef="gdp">
-        <th mat-header-cell *matHeaderCellDef> Percent of gdp </th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Percent of gdp </th>
         <td mat-cell *matCellDef="let element"> {{element.gdp | number: '1.1'}}% </td>
       </ng-container>
 
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef> Actions </th>
         <td mat-cell *matCellDef="let element">
-          <button mat-mini-fab color="warn" (click)="deleteAnnualRecord()" style="margin-right: 5px"><i class="material-icons md-48" >delete</i></button>
+          <button mat-mini-fab color="warn" (click)="deleteAnnualRecord(element.id)" style="margin-right: 5px"><i class="material-icons md-48" >delete</i></button>
           <button mat-mini-fab color="primary" (click)="selectAnnualRecord(element)"><i class="material-icons md-48">edit</i></button>
         </td>
       </ng-container>
@@ -58,7 +63,7 @@
     <mat-card-header>
       <mat-card-title>{{!isEdit?"Add new":"Edit"}} record</mat-card-title>
     </mat-card-header>
-    <form [formGroup]="registerForm">
+    <form [formGroup]="annualRecordForm">
       <mat-form-field class="form-field">
         <mat-label>{{'Year'}}</mat-label>
         <input type="number" matInput formControlName="year" id="recordYear">
@@ -66,7 +71,7 @@
 
       <mat-form-field class="form-field">
         <mat-label>{{'State'}}</mat-label>
-        <mat-select [formControl]="$any(registerForm).controls['state']" id="recordState">
+        <mat-select [formControl]="$any(annualRecordForm).controls['state']" id="recordState">
           <mat-option value="Actual">Actual</mat-option>
           <mat-option value="Revised">Revised</mat-option>
           <mat-option value="Estimated">Estimated</mat-option>
@@ -99,7 +104,7 @@
       <button *ngIf="isEdit" mat-flat-button color="warn" type="button" style="margin-right: 10px" id="cancelTournament" (click)="cancelButton()">
         {{'Cancel'}}
       </button>
-      <button  [disabled]="!registerForm.valid" mat-flat-button color="primary" type="button" (click)="saveAnnualRecord()" id="saveTournament">{{isEdit?"Save":"Add"}}</button>
+      <button [disabled]="!annualRecordForm.valid" mat-flat-button color="primary" type="button" (click)="saveAnnualRecord()" id="saveTournament">{{isEdit?"Save":"Add"}}</button>
     </form>
 
   </div>
