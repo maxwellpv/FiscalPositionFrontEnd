@@ -3,6 +3,14 @@ table {
   min-width: 600px;
 }
 
+form .mat-form-field{
+  margin: 10px 10px 0 0;
+}
+
+form button{
+  margin: 0 10px 0 10px;
+}
+
 .container{
   /*display: flex;*/
   /*justify-content: center;*/

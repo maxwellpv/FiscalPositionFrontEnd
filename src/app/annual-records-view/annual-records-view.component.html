@@ -2,17 +2,17 @@
 <div class="container">
 
   <div class="mat-elevation-z8 md-margin">
+    <mat-card-header>
+      <mat-card-title>Government Budget and Fiscal Position, Annual</mat-card-title>
+    </mat-card-header>
     <mat-form-field style="width: 100%">
       <mat-label>Filter</mat-label>
       <input matInput (keyup)="applyFilter($event)" placeholder="Ex. 2020" #input>
     </mat-form-field>
-    <mat-card-header>
-      <mat-card-title>Government Budget and Fiscal Position, Annual</mat-card-title>
-    </mat-card-header>
     <table mat-table [dataSource]="dataSource" matSort>
 
       <!-- Position Column -->
-      <ng-container matColumnDef="year">
+      <ng-container matColumnDef="year" >
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Year of balance </th>
         <td mat-cell *matCellDef="let element"> {{element.year}} </td>
       </ng-container>
@@ -64,12 +64,12 @@
       <mat-card-title>{{!isEdit?"Add new":"Edit"}} record</mat-card-title>
     </mat-card-header>
     <form [formGroup]="annualRecordForm">
-      <mat-form-field class="form-field">
+      <mat-form-field class="form-field" appearance="fill">
         <mat-label>{{'Year'}}</mat-label>
         <input type="number" matInput formControlName="year" id="recordYear">
       </mat-form-field>
 
-      <mat-form-field class="form-field">
+      <mat-form-field class="form-field" appearance="fill">
         <mat-label>{{'State'}}</mat-label>
         <mat-select [formControl]="$any(annualRecordForm).controls['state']" id="recordState">
           <mat-option value="Actual">Actual</mat-option>
@@ -78,22 +78,22 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field class="form-field">
+      <mat-form-field class="form-field" appearance="fill">
         <mat-label>{{'Category'}}</mat-label>
         <input type="text" matInput formControlName="category" id="recordCategory">
       </mat-form-field>
 
-      <mat-form-field class="form-field">
+      <mat-form-field class="form-field" appearance="fill">
         <mat-label>{{'Item'}}</mat-label>
         <input type="text" matInput formControlName="item" id="recordItem">
       </mat-form-field>
 
-      <mat-form-field class="form-field">
+      <mat-form-field class="form-field" appearance="fill">
         <mat-label>{{'Amount'}}</mat-label>
         <input type="number" matInput formControlName="amount" id="recordAmount">
       </mat-form-field>
 
-      <mat-form-field class="form-field">
+      <mat-form-field class="form-field" appearance="fill">
         <mat-label>{{'Percent of gdp'}}</mat-label>
         <input type="number" matInput formControlName="gdp" id="recordGdp">
       </mat-form-field>
