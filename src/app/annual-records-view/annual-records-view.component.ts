@@ -3,6 +3,7 @@ import {AfterViewInit, ViewChild} from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatTableDataSource} from '@angular/material/table';
 import {AnnualRecordService} from "../services/annual-record.service";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 @Component({
   selector: 'app-annual-records-view',
@@ -10,10 +11,21 @@ import {AnnualRecordService} from "../services/annual-record.service";
   styleUrls: ['./annual-records-view.component.css']
 })
 export class AnnualRecordsViewComponent implements OnInit {
-  displayedColumns: string[] = ['year', 'state', 'category', 'item', 'amount', 'gdp'];
+  displayedColumns: string[] = ['year', 'state', 'category', 'item', 'amount', 'gdp', 'actions'];
   annualRecords!: any[];
   dataSource = new MatTableDataSource<AnnualRecord>(this.annualRecords);
+  clickedRows = new Set<any>();
+  isEdit = false;
+  editId = 0;
 
+  registerForm: FormGroup =  this.formBuilder.group({
+    year: ['', {validators: [Validators.min(1900), Validators.required, Validators.pattern("^[0-9]*$"), Validators.max(2100)], updateOn: 'change'}],
+    gdp: ['', {validators: [Validators.required], updateOn: 'change'}],
+    amount: ['',{validators: [Validators.required], updateOn: 'change'} ],
+    item: ['', {validators: [Validators.required], updateOn: 'change'}],
+    category: ['', {validators: [Validators.required], updateOn: 'change'}],
+    state: ['', {validators: [Validators.required], updateOn: 'change'}],
+  });
 
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
 
@@ -21,17 +33,92 @@ export class AnnualRecordsViewComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
   }
 
-  constructor(private annualRecordService: AnnualRecordService) {
-    annualRecordService.getAllAnnualRecords().subscribe(
+  loadData(){
+    this.annualRecordService.getAllAnnualRecords().subscribe(
       data => {
         this.annualRecords = data;
         this.dataSource = new MatTableDataSource<AnnualRecord>(this.annualRecords);
-        console.log(data);
       }
     )
   }
 
+  constructor(private annualRecordService: AnnualRecordService, private formBuilder: FormBuilder) {
+    this.loadData()
+  }
+
   ngOnInit(): void {
+  }
+
+  public findInvalidControls() {
+    const invalid = [];
+    const controls = this.registerForm.controls;
+    for (const name in controls) {
+      if (controls[name].invalid) {
+        invalid.push(name);
+      }
+    }
+    return invalid;
+  }
+
+  selectAnnualRecord(row: any){
+    this.editId = row.id;
+    // this.registerForm.controls['id'].setValue(row.id);
+    this.registerForm.controls['year'].setValue(row.year);
+    this.registerForm.controls['state'].setValue(row.state);
+    this.registerForm.controls['category'].setValue(row.category);
+    this.registerForm.controls['item'].setValue(row.item);
+    this.registerForm.controls['amount'].setValue(row.amount);
+    this.registerForm.controls['gdp'].setValue(row.gdp);
+    this.isEdit = true;
+    console.log(row);
+  }
+
+  clearForm(){
+    this.registerForm.controls['year'].setValue('');
+    this.registerForm.controls['state'].setValue('');
+    this.registerForm.controls['category'].setValue('');
+    this.registerForm.controls['item'].setValue('');
+    this.registerForm.controls['amount'].setValue('');
+    this.registerForm.controls['gdp'].setValue('');
+    this.editId = 0;
+  }
+
+  cancelButton(){
+    // this.registerForm.controls['id'].setValue(row.id);
+    this.clearForm()
+    this.isEdit = false;
+  }
+
+  saveAnnualRecord(){
+    let item = {
+      year: this.registerForm.controls['year'].value,
+      state: this.registerForm.controls['state'].value,
+      category: this.registerForm.controls['category'].value,
+      item: this.registerForm.controls['item'].value,
+      amount: this.registerForm.controls['amount'].value,
+      gdp: this.registerForm.controls['gdp'].value
+    }
+    console.log("Errores")
+    console.log(this.findInvalidControls())
+    if(this.editId!=0){
+      this.annualRecordService.putAnnualRecord(item, this.editId).subscribe((response:any)=>{
+        window.alert("Annual Record saved successful.");
+        this.loadData();
+        this.clearForm();
+      });
+    } else {
+      this.annualRecordService.postAnnualRecord(item).subscribe((response:any)=>{
+        window.alert("Annual Record updated successful.");
+        this.loadData();
+        this.clearForm();
+      });
+    }
+
+    console.log(item);
+  }
+
+  deleteAnnualRecord(){
+
   }
 
 }

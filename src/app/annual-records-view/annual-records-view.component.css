@@ -1,3 +1,25 @@
 table {
   width: 100%;
+  /*min-width: 600px;*/
+}
+
+.container{
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 20px;
+}
+
+.md-margin{
+  padding: 20px;
+}
+
+/*.mat-row {*/
+/*  border-bottom: 1px solid transparent;*/
+/*  border-top: 1px solid transparent;*/
+/*  cursor: pointer;*/
+/*}*/
+
+tr.mat-row:hover {
+  background: darkgray !important;
 }

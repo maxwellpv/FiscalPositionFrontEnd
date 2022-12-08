@@ -1,46 +1,107 @@
-<div class="mat-elevation-z8">
-  <table mat-table [dataSource]="dataSource">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<div class="container">
+  <div class="mat-elevation-z8 md-margin">
+    <mat-card-header>
+      <mat-card-title>Government Budget and Fiscal Position, Annual</mat-card-title>
+    </mat-card-header>
+    <table mat-table [dataSource]="dataSource">
 
-    <!-- Position Column -->
-    <ng-container matColumnDef="year">
-      <th mat-header-cell *matHeaderCellDef> Year of balance </th>
-      <td mat-cell *matCellDef="let element"> {{element.year}} </td>
-    </ng-container>
+      <!-- Position Column -->
+      <ng-container matColumnDef="year">
+        <th mat-header-cell *matHeaderCellDef> Year of balance </th>
+        <td mat-cell *matCellDef="let element"> {{element.year}} </td>
+      </ng-container>
 
-    <!-- Name Column -->
-    <ng-container matColumnDef="state">
-      <th mat-header-cell *matHeaderCellDef> Actual/Revised/Estimated </th>
-      <td mat-cell *matCellDef="let element"> {{element.state}} </td>
-    </ng-container>
+      <!-- Name Column -->
+      <ng-container matColumnDef="state">
+        <th mat-header-cell *matHeaderCellDef> Actual/Revised/Estimated </th>
+        <td mat-cell *matCellDef="let element"> {{element.state}} </td>
+      </ng-container>
 
-    <!-- Weight Column -->
-    <ng-container matColumnDef="category">
-      <th mat-header-cell *matHeaderCellDef> Category </th>
-      <td mat-cell *matCellDef="let element"> {{element.category}} </td>
-    </ng-container>
+      <!-- Weight Column -->
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef> Category </th>
+        <td mat-cell *matCellDef="let element"> {{element.category}} </td>
+      </ng-container>
 
-    <!-- Symbol Column -->
-    <ng-container matColumnDef="item">
-      <th mat-header-cell *matHeaderCellDef> Item </th>
-      <td mat-cell *matCellDef="let element"> {{element.item}} </td>
-    </ng-container>
+      <!-- Symbol Column -->
+      <ng-container matColumnDef="item">
+        <th mat-header-cell *matHeaderCellDef> Item </th>
+        <td mat-cell *matCellDef="let element"> {{element.item}} </td>
+      </ng-container>
 
-    <ng-container matColumnDef="amount">
-      <th mat-header-cell *matHeaderCellDef> Amount (S$ million) </th>
-      <td mat-cell *matCellDef="let element"> {{element.amount}} </td>
-    </ng-container>
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef> Amount (S$ million) </th>
+        <td mat-cell *matCellDef="let element"> {{element.amount | number: '1.2'}} </td>
+      </ng-container>
 
-    <ng-container matColumnDef="gdp">
-      <th mat-header-cell *matHeaderCellDef> Percent of gdp </th>
-      <td mat-cell *matCellDef="let element"> {{element.gdp}} </td>
-    </ng-container>
+      <ng-container matColumnDef="gdp">
+        <th mat-header-cell *matHeaderCellDef> Percent of gdp </th>
+        <td mat-cell *matCellDef="let element"> {{element.gdp | number: '1.1'}}% </td>
+      </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-mini-fab color="warn" (click)="deleteAnnualRecord()" style="margin-right: 5px"><i class="material-icons md-48" >delete</i></button>
+          <button mat-mini-fab color="primary" (click)="selectAnnualRecord(element)"><i class="material-icons md-48">edit</i></button>
+        </td>
+      </ng-container>
 
-  <mat-paginator [pageSizeOptions]="[5, 10, 20]"
-                 showFirstLastButtons
-                 aria-label="Select page of records">
-  </mat-paginator>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" ></tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+                   showFirstLastButtons
+                   aria-label="Select page of records">
+    </mat-paginator>
+    <mat-card-header>
+      <mat-card-title>{{!isEdit?"Add new":"Edit"}} record</mat-card-title>
+    </mat-card-header>
+    <form [formGroup]="registerForm">
+      <mat-form-field class="form-field">
+        <mat-label>{{'Year'}}</mat-label>
+        <input type="number" matInput formControlName="year" id="recordYear">
+      </mat-form-field>
+
+      <mat-form-field class="form-field">
+        <mat-label>{{'State'}}</mat-label>
+        <mat-select [formControl]="$any(registerForm).controls['state']" id="recordState">
+          <mat-option value="Actual">Actual</mat-option>
+          <mat-option value="Revised">Revised</mat-option>
+          <mat-option value="Estimated">Estimated</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="form-field">
+        <mat-label>{{'Category'}}</mat-label>
+        <input type="text" matInput formControlName="category" id="recordCategory">
+      </mat-form-field>
+
+      <mat-form-field class="form-field">
+        <mat-label>{{'Item'}}</mat-label>
+        <input type="text" matInput formControlName="item" id="recordItem">
+      </mat-form-field>
+
+      <mat-form-field class="form-field">
+        <mat-label>{{'Amount'}}</mat-label>
+        <input type="number" matInput formControlName="amount" id="recordAmount">
+      </mat-form-field>
+
+      <mat-form-field class="form-field">
+        <mat-label>{{'Percent of gdp'}}</mat-label>
+        <input type="number" matInput formControlName="gdp" id="recordGdp">
+      </mat-form-field>
+
+
+
+      <br>
+      <button *ngIf="isEdit" mat-flat-button color="warn" type="button" style="margin-right: 10px" id="cancelTournament" (click)="cancelButton()">
+        {{'Cancel'}}
+      </button>
+      <button  [disabled]="!registerForm.valid" mat-flat-button color="primary" type="button" (click)="saveAnnualRecord()" id="saveTournament">{{isEdit?"Save":"Add"}}</button>
+    </form>
+
+  </div>
 </div>
+

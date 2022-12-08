@@ -33,8 +33,21 @@ export class AnnualRecordService {
   }
 
   getAllAnnualRecords(): Observable<any[]>{
-    return this.http.get<any[]>(`${this.baseUrl}`, this.httpOptions).pipe(
+    return this.http.get<any[]>(this.baseUrl, this.httpOptions).pipe(
       retry(2), catchError(this.handleError)
     );
   }
+
+  postAnnualRecord(item:any):Observable<any>{
+    return this.http.post<any>(this.baseUrl,JSON.stringify(item), this.httpOptions).pipe(
+      retry(2), catchError(this.handleError)
+    );
+  }
+
+  putAnnualRecord(item:any, id:number):Observable<any>{
+    return this.http.put<any>(`${this.baseUrl}/${id}`,JSON.stringify(item), this.httpOptions).pipe(
+      retry(2), catchError(this.handleError)
+    );
+  }
+
 }
